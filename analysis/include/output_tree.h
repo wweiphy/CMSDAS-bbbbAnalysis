@@ -1,0 +1,136 @@
+#ifndef OUTPUT_TREE_H
+#define OUTPUT_TREE_H
+
+#include "TTree.h"
+
+// to add a variable
+// 1) add it to the list of declared member variables
+// 2) add the corresponding SetBranchAddress in init()
+// 3) add a clear default value in clear()
+
+class output_tree {
+    public:
+        output_tree();
+        ~output_tree();
+
+        void clear_vars();
+        
+        int fill()  {return tree_->Fill();}
+        int write() {return tree_->Write();}
+        TTree* get_tree() {return tree_.get();}
+
+        // here list all the variables
+        unsigned int run_;              
+        unsigned int luminosityBlock_;  
+        long long    event_;            
+        float        xs_;               
+
+        float        btag_SF_;            
+        float        btag_SF_bup_;        
+        float        btag_SF_bdown_;      
+        float        btag_SF_cup_;        
+        float        btag_SF_cdown_;      
+        float        btag_SF_lightup_;    
+        float        btag_SF_lightdown_;  
+        float        norm_weight_;        
+
+        float H1_pt_;
+        float H1_eta_;
+        float H1_phi_;
+        float H1_m_;
+
+        float H2_pt_;
+        float H2_eta_;
+        float H2_phi_;
+        float H2_m_;
+
+        float HH_pt_;
+        float HH_eta_;
+        float HH_phi_;
+        float HH_m_;
+
+    private:
+        std::unique_ptr<TTree> tree_;
+        void init();
+};  
+
+output_tree::output_tree()
+{
+    init();
+}
+
+output_tree::~output_tree()
+{
+    tree_.release(); // to avoid crashes at the end of execution
+}
+
+void output_tree::init()
+{
+    tree_ = std::unique_ptr<TTree>(new TTree("bbbbTree", "bbbbTree"));
+
+    // create branches
+
+    tree_ -> Branch ("run",              &run_);
+    tree_ -> Branch ("luminosityBlock",  &luminosityBlock_);
+    tree_ -> Branch ("event",            &event_);
+    tree_ -> Branch ("xs",               &xs_);
+
+    tree_ ->Branch ("btag_SF",           &btag_SF_);
+    tree_ ->Branch ("btag_SF_bup",       &btag_SF_bup_);
+    tree_ ->Branch ("btag_SF_bdown",     &btag_SF_bdown_);
+    tree_ ->Branch ("btag_SF_cup",       &btag_SF_cup_);
+    tree_ ->Branch ("btag_SF_cdown",     &btag_SF_cdown_);
+    tree_ ->Branch ("btag_SF_lightup",   &btag_SF_lightup_);
+    tree_ ->Branch ("btag_SF_lightdown", &btag_SF_lightdown_);
+    tree_ ->Branch ("norm_weight",       &norm_weight_);
+
+    tree_ -> Branch ("H1_pt",  &H1_pt_);
+    tree_ -> Branch ("H1_eta", &H1_eta_);
+    tree_ -> Branch ("H1_phi", &H1_phi_);
+    tree_ -> Branch ("H1_m",   &H1_m_);
+    
+    tree_ -> Branch ("H2_pt",  &H2_pt_);
+    tree_ -> Branch ("H2_eta", &H2_eta_);
+    tree_ -> Branch ("H2_phi", &H2_phi_);
+    tree_ -> Branch ("H2_m",   &H2_m_);
+    
+    tree_ -> Branch ("HH_pt",  &HH_pt_);
+    tree_ -> Branch ("HH_eta", &HH_eta_);
+    tree_ -> Branch ("HH_phi", &HH_phi_);
+    tree_ -> Branch ("HH_m",   &HH_m_);
+}
+
+void output_tree::clear_vars()
+{
+
+    run_               = 0;
+    luminosityBlock_   = 0;
+    event_             = -999;
+    xs_                = -999;
+    
+    btag_SF_           = -999;
+    btag_SF_bup_       = -999;
+    btag_SF_bdown_     = -999;
+    btag_SF_cup_       = -999;
+    btag_SF_cdown_     = -999;
+    btag_SF_lightup_   = -999;
+    btag_SF_lightdown_ = -999;
+    norm_weight_       = -999;
+
+    H1_pt_  = -999;
+    H1_eta_ = -999;
+    H1_phi_ = -999;
+    H1_m_   = -999;
+
+    H2_pt_  = -999;
+    H2_eta_ = -999;
+    H2_phi_ = -999;
+    H2_m_   = -999;
+
+    HH_pt_  = -999;
+    HH_eta_ = -999;
+    HH_phi_ = -999;
+    HH_m_   = -999;
+}
+
+#endif
