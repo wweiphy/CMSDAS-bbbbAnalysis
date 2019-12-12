@@ -24,7 +24,7 @@ int main(int argc, char** argv)
     string inputFile  = argv[1];
     string outputFile = argv[2];    
 
-    TFile* fIn = new TFile(inputFile.c_str());
+    TFile* fIn = TFile::Open(inputFile.c_str());
     TTree* tIn = (TTree*) fIn->Get("bbbbTree");
     TH1*   hIn = (TH1*)   fIn->Get("eff_histo");
 
