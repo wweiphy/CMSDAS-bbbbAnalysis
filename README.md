@@ -29,3 +29,11 @@ source prepare_all.sh
 ```
 
 As a result of the procedure above, you will find ntuples for the exercise under ``/store/user/cmsdas/2020/long_exercises/DoubleHiggs/${TAG}/dasformat``
+
+## Running the analysis
+
+1. From the inputs, build the Higgs bosons and high level objects/variables for the MVA. A skeleton of code with I/O is ``prepare_inputs.cpp`` . A script to run on all the samples is :
+```
+cd analysis
+source build_all.sh
+```
