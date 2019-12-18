@@ -34,6 +34,9 @@ class output_tree {
         float        btag_SF_lightdown_;  
         float        norm_weight_;        
 
+        int  n_btag_;
+
+        // composite candidates
         float H1_pt_;
         float H1_eta_;
         float H1_phi_;
@@ -48,6 +51,37 @@ class output_tree {
         float HH_eta_;
         float HH_phi_;
         float HH_m_;
+
+        // other variables
+        float H1H2_deltaEta_;
+        float H1H2_deltaPhi_;
+        float H1_costhetaCM_;
+
+        // jets
+        float H1_b1_pt_;
+        float H1_b1_eta_;
+        float H1_b1_phi_;
+        float H1_b1_m_;
+
+        float H1_b2_pt_;
+        float H1_b2_eta_;
+        float H1_b2_phi_;
+        float H1_b2_m_;
+
+        float H2_b1_pt_;
+        float H2_b1_eta_;
+        float H2_b1_phi_;
+        float H2_b1_m_;
+
+        float H2_b2_pt_;
+        float H2_b2_eta_;
+        float H2_b2_phi_;
+        float H2_b2_m_;
+
+        float rndm_1_;
+        float rndm_2_;
+        float rndm_3_;
+
 
     private:
         std::unique_ptr<TTree> tree_;
@@ -84,6 +118,8 @@ void output_tree::init()
     tree_ ->Branch ("btag_SF_lightdown", &btag_SF_lightdown_);
     tree_ ->Branch ("norm_weight",       &norm_weight_);
 
+    tree_ ->Branch ("n_btag",  &n_btag_);
+
     tree_ -> Branch ("H1_pt",  &H1_pt_);
     tree_ -> Branch ("H1_eta", &H1_eta_);
     tree_ -> Branch ("H1_phi", &H1_phi_);
@@ -98,11 +134,39 @@ void output_tree::init()
     tree_ -> Branch ("HH_eta", &HH_eta_);
     tree_ -> Branch ("HH_phi", &HH_phi_);
     tree_ -> Branch ("HH_m",   &HH_m_);
+
+    tree_ -> Branch ("H1H2_deltaEta", &H1H2_deltaEta_);
+    tree_ -> Branch ("H1H2_deltaPhi", &H1H2_deltaPhi_);
+    tree_ -> Branch ("H1_costhetaCM", &H1_costhetaCM_);
+
+    tree_ -> Branch ("H1_b1_pt",  &H1_b1_pt_);
+    tree_ -> Branch ("H1_b1_eta", &H1_b1_eta_);
+    tree_ -> Branch ("H1_b1_phi", &H1_b1_phi_);
+    tree_ -> Branch ("H1_b1_m",   &H1_b1_m_);
+
+    tree_ -> Branch ("H1_b2_pt",  &H1_b2_pt_);
+    tree_ -> Branch ("H1_b2_eta", &H1_b2_eta_);
+    tree_ -> Branch ("H1_b2_phi", &H1_b2_phi_);
+    tree_ -> Branch ("H1_b2_m",   &H1_b2_m_);
+
+    tree_ -> Branch ("H2_b1_pt",  &H2_b1_pt_);
+    tree_ -> Branch ("H2_b1_eta", &H2_b1_eta_);
+    tree_ -> Branch ("H2_b1_phi", &H2_b1_phi_);
+    tree_ -> Branch ("H2_b1_m",   &H2_b1_m_);
+
+    tree_ -> Branch ("H2_b2_pt",  &H2_b2_pt_);
+    tree_ -> Branch ("H2_b2_eta", &H2_b2_eta_);
+    tree_ -> Branch ("H2_b2_phi", &H2_b2_phi_);
+    tree_ -> Branch ("H2_b2_m",   &H2_b2_m_);
+
+    tree_ -> Branch ("rndm_1", &rndm_1_);
+    tree_ -> Branch ("rndm_2", &rndm_2_);
+    tree_ -> Branch ("rndm_3", &rndm_3_);
+
 }
 
 void output_tree::clear_vars()
 {
-
     run_               = 0;
     luminosityBlock_   = 0;
     event_             = -999;
@@ -116,6 +180,8 @@ void output_tree::clear_vars()
     btag_SF_lightup_   = -999;
     btag_SF_lightdown_ = -999;
     norm_weight_       = -999;
+
+    n_btag_ = -999;
 
     H1_pt_  = -999;
     H1_eta_ = -999;
@@ -131,6 +197,34 @@ void output_tree::clear_vars()
     HH_eta_ = -999;
     HH_phi_ = -999;
     HH_m_   = -999;
+
+    H1H2_deltaEta_ = -999;
+    H1H2_deltaPhi_ = -999;
+    H1_costhetaCM_ = -999;
+
+    H1_b1_pt_  = -999;
+    H1_b1_eta_ = -999;
+    H1_b1_phi_ = -999;
+    H1_b1_m_   = -999;
+
+    H1_b2_pt_  = -999;
+    H1_b2_eta_ = -999;
+    H1_b2_phi_ = -999;
+    H1_b2_m_   = -999;
+
+    H2_b1_pt_  = -999;
+    H2_b1_eta_ = -999;
+    H2_b1_phi_ = -999;
+    H2_b1_m_   = -999;
+
+    H2_b2_pt_  = -999;
+    H2_b2_eta_ = -999;
+    H2_b2_phi_ = -999;
+    H2_b2_m_   = -999;
+
+    rndm_1_ = -999;
+    rndm_2_ = -999;
+    rndm_3_ = -999;
 }
 
 #endif
