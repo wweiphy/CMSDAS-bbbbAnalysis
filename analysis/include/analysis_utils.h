@@ -13,7 +13,7 @@ struct jet_t {
     float phi;
     float m;
 
-    float DeepB;
+    float btagscore;
     float bRegCorr;
     float bRegRes;
     int   jetId;
@@ -34,20 +34,20 @@ struct jet_t {
 
 // simple preprocessing macro to initialise the content from the tree
 // just avoids copying stuff by hand
-#define init_jet_t(OBJ, IDX, TREEREADER) \
-    OBJ . pt                   = *( TREEREADER .  jet ## IDX ## _pt                    ) ; \
-    OBJ . eta                  = *( TREEREADER .  jet ## IDX ## _eta                   ) ; \
-    OBJ . phi                  = *( TREEREADER .  jet ## IDX ## _phi                   ) ; \
-    OBJ . m                    = *( TREEREADER .  jet ## IDX ## _m                     ) ; \
-    OBJ . DeepB                = *( TREEREADER .  jet ## IDX ## _DeepB                 ) ; \
-    OBJ . bRegCorr             = *( TREEREADER .  jet ## IDX ## _bRegCorr              ) ; \
-    OBJ . bRegRes              = *( TREEREADER .  jet ## IDX ## _bRegRes               ) ; \
-    OBJ . jetId                = *( TREEREADER .  jet ## IDX ## _jetId                 ) ; \
-    OBJ . puId                 = *( TREEREADER .  jet ## IDX ## _puId                  ) ; \
-    OBJ . genjet_pt            = *( TREEREADER .  genjet ## IDX ## _pt                 ) ; \
-    OBJ . genjet_eta           = *( TREEREADER .  genjet ## IDX ## _eta                ) ; \
-    OBJ . genjet_phi           = *( TREEREADER .  genjet ## IDX ## _phi                ) ; \
-    OBJ . genjet_m             = *( TREEREADER .  genjet ## IDX ## _m                  ) ; \
-    OBJ . genjet_hadronFlavour = *( TREEREADER .  genjet ## IDX ## _hadronFlavour      ) ; \
+#define init_jet_t(OBJ, IDX, TREEREADER, SAMPLETYPE) \
+    OBJ . pt                   = **( TREEREADER .  jet ## IDX ## _pt                    ) ; \
+    OBJ . eta                  = **( TREEREADER .  jet ## IDX ## _eta                   ) ; \
+    OBJ . phi                  = **( TREEREADER .  jet ## IDX ## _phi                   ) ; \
+    OBJ . m                    = **( TREEREADER .  jet ## IDX ## _m                     ) ; \
+    OBJ . btagscore            = **( TREEREADER .  jet ## IDX ## _btagscore             ) ; \
+    OBJ . bRegCorr             = **( TREEREADER .  jet ## IDX ## _bRegCorr              ) ; \
+    OBJ . bRegRes              = **( TREEREADER .  jet ## IDX ## _bRegRes               ) ; \
+    OBJ . jetId                = **( TREEREADER .  jet ## IDX ## _jetId                 ) ; \
+    OBJ . puId                 = **( TREEREADER .  jet ## IDX ## _puId                  ) ; \
+    OBJ . genjet_pt            = ( SAMPLETYPE == "data" ? -999 : **( TREEREADER .  genjet ## IDX ## _pt                 ) ); \
+    OBJ . genjet_eta           = ( SAMPLETYPE == "data" ? -999 : **( TREEREADER .  genjet ## IDX ## _eta                ) ); \
+    OBJ . genjet_phi           = ( SAMPLETYPE == "data" ? -999 : **( TREEREADER .  genjet ## IDX ## _phi                ) ); \
+    OBJ . genjet_m             = ( SAMPLETYPE == "data" ? -999 : **( TREEREADER .  genjet ## IDX ## _m                  ) ); \
+    OBJ . genjet_hadronFlavour = ( SAMPLETYPE == "data" ? -999 : **( TREEREADER .  genjet ## IDX ## _hadronFlavour      ) ); \
 
 #endif

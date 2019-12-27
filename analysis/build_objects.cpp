@@ -23,7 +23,7 @@ int main(int argc, char** argv)
 
     if (argc < 3)
     {
-        cout << "*** usage : ./build_objects inputFile outputFile isData=0" << endl;
+        cout << "*** usage : ./build_objects inputFile outputFile isData=0 isSignal=0" << endl;
         return 1;
     }
 
@@ -31,7 +31,7 @@ int main(int argc, char** argv)
     string outputFile = argv[2];    
 
     cout << "[INFO] Input  file: " << inputFile << endl;
-    TFile* fIn = new TFile(inputFile.c_str());
+    TFile* fIn = TFile::Open(inputFile.c_str());
     TTree* tIn = (TTree*) fIn->Get("bbbbTree");
 
     cout << "[INFO] Output file: " << outputFile << endl;
@@ -39,19 +39,27 @@ int main(int argc, char** argv)
     TTree* tOut = new TTree ("bbbbTree", "bbbbTree");
 
     bool isData = false;
+    bool isSig  = false;
     if (argc >= 4)
         isData = (std::stoi(argv[3]) == 0 ? false : true);
+    if (argc >= 5)
+        isSig = (std::stoi(argv[4]) == 0 ? false : true);
     cout << "[INFO] Is data?   : " << std::boolalpha << isData << std::noboolalpha << endl;
+    cout << "[INFO] Is signal? : " << std::boolalpha << isSig  << std::noboolalpha << endl;
 
-    // prepare the input tree reader
+    std::string sample_type = "bkg";
+    if (isData) sample_type = "data";
+    if (isSig)  sample_type = "sig";
+    cout << "[INFO] The tree will be read for type : " << sample_type << endl;
 
+    const float btag_WP_medium = 0.3093; // for DeepJet
 
     // declaring the output tree - use the output_tree class
     // output variables are defined inside there
     output_tree otree;
 
-    // running the event loop
-    input_tree itree(tIn);
+    // prepare the input tree reader and run the event loop
+    input_tree itree(tIn, sample_type);
 
     const auto nEv = tIn->GetEntries();
     for (uint iEv = 0; iEv < nEv; ++iEv)
@@ -65,12 +73,11 @@ int main(int argc, char** argv)
 
         // prepare the objects of the 4 jets
         jet_t jet1, jet2, jet3, jet4;
-
         // the macros below copy the properties of the jet with the specified index (1,2,3,4) to the jet object (jet1,jet2,jet3,jet4)
-        init_jet_t(jet1, 1, itree) ;
-        init_jet_t(jet2, 2, itree) ;
-        init_jet_t(jet3, 3, itree) ;
-        init_jet_t(jet4, 4, itree) ;
+        init_jet_t(jet1, 1, itree, sample_type) ;
+        init_jet_t(jet2, 2, itree, sample_type) ;
+        init_jet_t(jet3, 3, itree, sample_type) ;
+        init_jet_t(jet4, 4, itree, sample_type) ;
 
         // compute regressed quantities and other member variables
         jet1.pt_breg = jet1.bRegCorr * jet1.pt;
@@ -111,8 +118,17 @@ int main(int argc, char** argv)
         v_H2 = result.at(2).p4_breg + result.at(3).p4_breg;
 
         // order them by highest pT: pt(H1) > pt(H2)
-        if (v_H1.Pt() < v_H2.Pt())
+
+        jet_t H1_b1 = result.at(0);
+        jet_t H1_b2 = result.at(1);
+        jet_t H2_b1 = result.at(2);
+        jet_t H2_b2 = result.at(3);
+
+        if (v_H1.Pt() < v_H2.Pt()){
             std::swap(v_H1, v_H2);
+            std::swap(H1_b1, H2_b1);
+            std::swap(H1_b2, H2_b2);
+        }
 
         v_HH = v_H1 + v_H2;
         // ========================================
@@ -134,20 +150,58 @@ int main(int argc, char** argv)
         otree.HH_phi_ = v_HH.Phi();
         otree.HH_m_   = v_HH.M();
 
-        // and fw from the input
-        otree.run_                = *(itree.run);
-        otree.luminosityBlock_    = *(itree.luminosityBlock);
-        otree.event_              = *(itree.event);
-        otree.xs_                 = *(itree.xs);
+        otree.H1_b1_pt_  = H1_b1.p4_breg.Pt();
+        otree.H1_b1_eta_ = H1_b1.p4_breg.Eta();
+        otree.H1_b1_phi_ = H1_b1.p4_breg.Phi();
+        otree.H1_b1_m_   = H1_b1.p4_breg.M();
 
-        otree.btag_SF_            = *(itree.btag_SF);
-        otree.btag_SF_bup_        = *(itree.btag_SF_bup);
-        otree.btag_SF_bdown_      = *(itree.btag_SF_bdown);
-        otree.btag_SF_cup_        = *(itree.btag_SF_cup);
-        otree.btag_SF_cdown_      = *(itree.btag_SF_cdown);
-        otree.btag_SF_lightup_    = *(itree.btag_SF_lightup);
-        otree.btag_SF_lightdown_  = *(itree.btag_SF_lightdown);
-        otree.norm_weight_        = *(itree.norm_weight);
+        otree.H1_b2_pt_  = H1_b2.p4_breg.Pt();
+        otree.H1_b2_eta_ = H1_b2.p4_breg.Eta();
+        otree.H1_b2_phi_ = H1_b2.p4_breg.Phi();
+        otree.H1_b2_m_   = H1_b2.p4_breg.M();
+
+        otree.H2_b1_pt_  = H2_b1.p4_breg.Pt();
+        otree.H2_b1_eta_ = H2_b1.p4_breg.Eta();
+        otree.H2_b1_phi_ = H2_b1.p4_breg.Phi();
+        otree.H2_b1_m_   = H2_b1.p4_breg.M();
+
+        otree.H2_b2_pt_  = H2_b2.p4_breg.Pt();
+        otree.H2_b2_eta_ = H2_b2.p4_breg.Eta();
+        otree.H2_b2_phi_ = H2_b2.p4_breg.Phi();
+        otree.H2_b2_m_   = H2_b2.p4_breg.M();
+
+        otree.H1H2_deltaEta_   = std::abs( v_H1.Eta() - v_H2.Eta() );
+        otree.H1H2_deltaPhi_   = v_H1.DeltaPhi(v_H2);
+
+        // boost H1 to the bbbb CM
+        TLorentzVector vH1_cm = v_H1;
+        vH1_cm.Boost(-v_HH.BoostVector());
+        otree.H1_costhetaCM_  = vH1_cm.CosTheta();
+
+        // and fw from the input
+        otree.run_                = **(itree.run);
+        otree.luminosityBlock_    = **(itree.luminosityBlock);
+        otree.event_              = **(itree.event);
+        otree.xs_                 = **(itree.xs);
+
+        otree.btag_SF_            = **(itree.btag_SF);
+        otree.btag_SF_bup_        = **(itree.btag_SF_bup);
+        otree.btag_SF_bdown_      = **(itree.btag_SF_bdown);
+        otree.btag_SF_cup_        = **(itree.btag_SF_cup);
+        otree.btag_SF_cdown_      = **(itree.btag_SF_cdown);
+        otree.btag_SF_lightup_    = **(itree.btag_SF_lightup);
+        otree.btag_SF_lightdown_  = **(itree.btag_SF_lightdown);
+        otree.norm_weight_        = **(itree.norm_weight);
+
+        otree.n_btag_ = 0;
+        if (result.at(0).btagscore > btag_WP_medium) ++otree.n_btag_;
+        if (result.at(1).btagscore > btag_WP_medium) ++otree.n_btag_;
+        if (result.at(2).btagscore > btag_WP_medium) ++otree.n_btag_;
+        if (result.at(3).btagscore > btag_WP_medium) ++otree.n_btag_;
+
+        otree.rndm_1_ = **(itree.rndm_1);
+        otree.rndm_2_ = **(itree.rndm_2);
+        otree.rndm_3_ = **(itree.rndm_3);
 
         otree.fill();
     }
