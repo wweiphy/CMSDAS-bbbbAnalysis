@@ -1,6 +1,11 @@
 # CMSDAS-bbbbAnalysis
 Code and instructions for preparation and support of the CMS DAS HH -> bbbb analysis exercise
 
+For further information on the exercise check [the TWiki](https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideCMSDataAnalysisSchoolLPC2020HHToFourB)
+
+Part of the information reported below targets the preparation of the inputs and not the development of the exercise itself.
+Refer to the TWiki for instructions on how to run the exercise.
+
 ## Installing the repo
 1. Install the bbbbAnalysis code following the instructions [here](https://github.com/UF-HH/bbbbAnalysis), using the ``CMSDAS-exercise`` branch
 2. ``git clone https://github.com/l-cadamuro/CMSDAS-bbbbAnalysis``
