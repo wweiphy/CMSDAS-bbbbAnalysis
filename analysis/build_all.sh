@@ -24,7 +24,7 @@
 # ... the program took 12 seconds
 
 
-TAG="ntuples_11Dic2019_v6"
+TAG="analysisNtuples_final"
 # IN_FLDR="/store/user/lcadamur/bbbb_ntuples_CMSDAS"
 IN_FLDR="/store/user/cmsdas/2020/long_exercises/DoubleHiggs/${TAG}/dasformat"
 # TMP_FLDR=`pwd`
