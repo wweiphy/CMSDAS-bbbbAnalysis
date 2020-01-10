@@ -1,9 +1,15 @@
 # CMSDAS-bbbbAnalysis
 Code and instructions for preparation and support of the CMS DAS HH -> bbbb analysis exercise
 
+For further information on the exercise check [the TWiki](https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideCMSDataAnalysisSchoolLPC2020HHToFourB)
+
+Part of the information reported below targets the preparation of the inputs and not the development of the exercise itself.
+Refer to the TWiki for instructions on how to run the exercise.
+
 ## Installing the repo
 1. Install the bbbbAnalysis code following the instructions [here](https://github.com/UF-HH/bbbbAnalysis), using the ``CMSDAS-exercise`` branch
 2. ``git clone https://github.com/l-cadamuro/CMSDAS-bbbbAnalysis``
+3. NOTE: the exercise works independently on SL6 and SL7. Installation instructions on the reference TWiki use the CMSSW version recommended for Run 2 data analysis (SL7), which is different from the one of the bbbbAnalysis above
 
 ## Preparing the input ntuples for the exercise
 
@@ -68,7 +74,7 @@ The total efficiency is eff(Double90Quad30 || Quad45) = eff(Double90Quad30) + ef
 where eff(Double90Quad30) is eff(L1)*eff(QuadCentralJet30)*eff(DoubleCentralJet90)*eff(BTagCaloCSVp087Triple)*eff(QuadPFCentralJetLooseID30)*eff(DoublePFCentralJetLooseID90). Same for eff(Quad45).
 eff(Double90Quad30 && Quad45) = eff(Double90Quad30) * eff_DJ(Quad45), where eff_DJ(Quad45) is the eff(Quad45) evaluated over a subset of events passing HLT_DoubleJet90_Double30_TripleBTagCSV_p087
 
-1. In the bbbbAnalysis package, launch all the trigger DAS skims (SingleMuon and MC TTbar datasets) using the FNAL batch
+1. Optional (already done for you): In the bbbbAnalysis package, launch all the trigger DAS skims (SingleMuon and MC TTbar datasets) using the FNAL batch
 ```
 ## launch
 source source scripts/submitAllTriggerSkimsOnTier3ForDAS.sh 
@@ -76,7 +82,7 @@ source source scripts/submitAllTriggerSkimsOnTier3ForDAS.sh
 for d in `ls -d ${JOBSDIR}/*` ; do echo $d ; python scripts/getTaskStatus.py --dir ${d} ; done
 ```
 
-2. Combine all the output files in a single one per sample (in the bbbbAnalysis package) (it should take 5-10 mins)
+2. Optional (already done for you): Combine all the output files in a single one per sample (in the bbbbAnalysis package) (it should take 5-10 mins)
 ```
 cmsenv
 voms-proxy-init -voms cms
@@ -84,11 +90,12 @@ hadd -f SingleMuon_Data_forTrigger.root `xrdfsls -u /store/user/<your_username>/
 hadd -f TTbar_MC_forTrigger.root `xrdfsls -u /store/user/<your_username>/bbbb_ntuples_CMSDAS_trigger/ntuples_26Dic2019_v4/SKIM_MC_TT_TuneCUETP8M2T4_13TeV_forTrigger/output`
 ```
 
-3. Produce trigger efficiency plots
+3. Produce trigger efficiency plots 
+go to CMSDAS-bbbbAnalysis folder 
 ```
 root -l
-.L scripts/TriggerEfficiencyByFilter.C+
-ProduceAllTriggerEfficiencies("SingleMuon_Data_forTrigger.root","TTbar_MC_forTrigger.root","TriggerEfficiencies.root")
+.L trigger/TriggerEfficiencyByFilter.C+
+ProduceAllTriggerEfficiencies("root://cmsxrootd.fnal.gov//store/user/cmsdas/2020/long_exercises/DoubleHiggs/triggerNtuples_30Dic2019/SingleMuon_Data_forTrigger.root","root://cmsxrootd.fnal.gov//store/user/cmsdas/2020/long_exercises/DoubleHiggs/triggerNtuples_30Dic2019/TTbar_MC_forTrigger.root","TriggerEfficiencies.root")
 ```
 At this point you should have the trigger efficiencies for each filter for data and MC in the file TriggerEfficiencies.root
 
