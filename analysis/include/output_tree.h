@@ -32,7 +32,8 @@ class output_tree {
         float        btag_SF_cdown_;      
         float        btag_SF_lightup_;    
         float        btag_SF_lightdown_;  
-        float        norm_weight_;        
+        float        norm_weight_;      
+        float        trigger_SF_;  
 
         int  n_btag_;
 
@@ -117,6 +118,7 @@ void output_tree::init()
     tree_ ->Branch ("btag_SF_lightup",   &btag_SF_lightup_);
     tree_ ->Branch ("btag_SF_lightdown", &btag_SF_lightdown_);
     tree_ ->Branch ("norm_weight",       &norm_weight_);
+    tree_ ->Branch ("trigger_SF",        &trigger_SF_);
 
     tree_ ->Branch ("n_btag",  &n_btag_);
 
@@ -180,6 +182,7 @@ void output_tree::clear_vars()
     btag_SF_lightup_   = -999;
     btag_SF_lightdown_ = -999;
     norm_weight_       = -999;
+    trigger_SF_        = -999;
 
     n_btag_ = -999;
 

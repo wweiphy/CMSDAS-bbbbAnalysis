@@ -47,6 +47,8 @@ int main(int argc, char** argv)
     cout << "[INFO] Is data?   : " << std::boolalpha << isData << std::noboolalpha << endl;
     cout << "[INFO] Is signal? : " << std::boolalpha << isSig  << std::noboolalpha << endl;
 
+    TriggerEfficiencyCalculator theTriggerEfficiencyCalculator("../trigger/TriggerEfficiencies.root");
+
     std::string sample_type = "bkg";
     if (isData) sample_type = "data";
     if (isSig)  sample_type = "sig";
@@ -202,6 +204,37 @@ int main(int argc, char** argv)
         otree.rndm_1_ = **(itree.rndm_1);
         otree.rndm_2_ = **(itree.rndm_2);
         otree.rndm_3_ = **(itree.rndm_3);
+
+        // calculate the triggerSF following the twiki indications
+        if(isData) otree.trigger_SF_ = 1.;
+        else
+        {
+            // Pay attention to provide the correct variable to estract the trigger efficiency!!
+            std::vector<float> jetPtVector {jet1.pt, jet2.pt, jet3.pt, jet4.pt};
+            // Remember to order the 4 jets by pT!! (search for std::sort)
+            // std::sort...; 
+
+            // Estract the efficiency for the four filters considered in data
+            float dataEfficiency_Double90Quad30_QuadCentralJet30   = theTriggerEfficiencyCalculator.getDataEfficiency_Double90Quad30_QuadCentralJet30  (-999.);
+            float dataEfficiency_Double90Quad30_DoubleCentralJet90 = theTriggerEfficiencyCalculator.getDataEfficiency_Double90Quad30_DoubleCentralJet90(-999.);
+            float dataEfficiency_Quad45_QuadCentralJet45           = theTriggerEfficiencyCalculator.getDataEfficiency_Quad45_QuadCentralJet45          (-999.);
+            float dataEfficiency_And_QuadCentralJet45              = theTriggerEfficiencyCalculator.getDataEfficiency_And_QuadCentralJet45             (-999.);
+            // Calculate data total efficiency
+            float dataEfficiency_Double90Quad30 = -999.;
+            float dataEfficiency = -999.;
+
+            // Estract the efficiency for the four filters considered in mc
+            float mcEfficiency_Double90Quad30_QuadCentralJet30     = theTriggerEfficiencyCalculator.getMcEfficiency_Double90Quad30_QuadCentralJet30    (-999.);
+            float mcEfficiency_Double90Quad30_DoubleCentralJet90   = theTriggerEfficiencyCalculator.getMcEfficiency_Double90Quad30_DoubleCentralJet90  (-999.);
+            float mcEfficiency_Quad45_QuadCentralJet45             = theTriggerEfficiencyCalculator.getMcEfficiency_Quad45_QuadCentralJet45            (-999.);
+            float mcEfficiency_And_QuadCentralJet45                = theTriggerEfficiencyCalculator.getMcEfficiency_And_QuadCentralJet45               (-999.);
+            // Calculate data total efficiency
+            float mcEfficiency_Double90Quad30 = -999.;
+            float mcEfficiency = -999.;
+
+            // Calculate the trigger scale factor (data/mc)
+            otree.trigger_SF_ = -999.;
+        }
 
         otree.fill();
     }
