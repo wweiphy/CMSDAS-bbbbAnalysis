@@ -6,6 +6,64 @@
 #include <iostream>
 #include "analysis_utils.h"
 #include "TMath.h"
+#include "TSpline.h"
+
+class TriggerEfficiencyCalculator
+{
+  public:
+    TriggerEfficiencyCalculator(std::string triggerEfficiencyFileName)
+    {
+        TFile triggerEfficiencyFile(triggerEfficiencyFileName.c_str());
+      
+        fSplineDataEfficiency_Double90Quad30_QuadCentralJet30   = getSplineFromFile(triggerEfficiencyFile, "SingleMuon_Double90Quad30_Spline_QuadCentralJet30"  );
+        fSplineDataEfficiency_Double90Quad30_DoubleCentralJet90 = getSplineFromFile(triggerEfficiencyFile, "SingleMuon_Double90Quad30_Spline_DoubleCentralJet90");
+        fSplineDataEfficiency_Quad45_QuadCentralJet45           = getSplineFromFile(triggerEfficiencyFile, "SingleMuon_Quad45_Spline_QuadCentralJet45"          );
+        fSplineDataEfficiency_And_QuadCentralJet45              = getSplineFromFile(triggerEfficiencyFile, "SingleMuon_And_Spline_QuadCentralJet45"             );
+
+        fSplineMcEfficiency_Double90Quad30_QuadCentralJet30     = getSplineFromFile(triggerEfficiencyFile, "TTbar_Double90Quad30_Spline_QuadCentralJet30"       );
+        fSplineMcEfficiency_Double90Quad30_DoubleCentralJet90   = getSplineFromFile(triggerEfficiencyFile, "TTbar_Double90Quad30_Spline_DoubleCentralJet90"     );
+        fSplineMcEfficiency_Quad45_QuadCentralJet45             = getSplineFromFile(triggerEfficiencyFile, "TTbar_Quad45_Spline_QuadCentralJet45"               );
+        fSplineMcEfficiency_And_QuadCentralJet45                = getSplineFromFile(triggerEfficiencyFile, "TTbar_And_Spline_QuadCentralJet45"                  );
+    }
+
+    float getDataEfficiency_Double90Quad30_QuadCentralJet30  (float fourthLeadingJet) {return getEfficiency(fSplineDataEfficiency_Double90Quad30_QuadCentralJet30   ,fourthLeadingJet);}
+    float getDataEfficiency_Double90Quad30_DoubleCentralJet90(float secondLeadingJet) {return getEfficiency(fSplineDataEfficiency_Double90Quad30_DoubleCentralJet90 ,secondLeadingJet);}
+    float getDataEfficiency_Quad45_QuadCentralJet45          (float fourthLeadingJet) {return getEfficiency(fSplineDataEfficiency_Quad45_QuadCentralJet45           ,fourthLeadingJet);}
+    float getDataEfficiency_And_QuadCentralJet45             (float fourthLeadingJet) {return getEfficiency(fSplineDataEfficiency_And_QuadCentralJet45              ,fourthLeadingJet);}
+    
+    float getMcEfficiency_Double90Quad30_QuadCentralJet30    (float fourthLeadingJet) {return getEfficiency(fSplineMcEfficiency_Double90Quad30_QuadCentralJet30     ,fourthLeadingJet);}
+    float getMcEfficiency_Double90Quad30_DoubleCentralJet90  (float secondLeadingJet) {return getEfficiency(fSplineMcEfficiency_Double90Quad30_DoubleCentralJet90   ,secondLeadingJet);}
+    float getMcEfficiency_Quad45_QuadCentralJet45            (float fourthLeadingJet) {return getEfficiency(fSplineMcEfficiency_Quad45_QuadCentralJet45             ,fourthLeadingJet);}
+    float getMcEfficiency_And_QuadCentralJet45               (float fourthLeadingJet) {return getEfficiency(fSplineMcEfficiency_And_QuadCentralJet45                ,fourthLeadingJet);}
+
+
+  private:
+    std::unique_ptr<TSpline> getSplineFromFile(TFile& inputFile, std::string splineName)
+    {
+        auto* spline = static_cast<TSpline*>(inputFile.Get(splineName.c_str()));
+        if(spline == nullptr) throw std::runtime_error("Spline " + splineName + " does not exist in file " + inputFile.GetName());
+
+        return std::unique_ptr<TSpline>(spline);
+    }
+
+    float getEfficiency(const std::unique_ptr<TSpline>& theSpline, float variableValue)
+    {
+        if     (variableValue > theSpline->GetXmax()) variableValue = theSpline->GetXmax();
+        else if(variableValue < theSpline->GetXmin()) variableValue = theSpline->GetXmin();
+        return theSpline->Eval(variableValue);
+    }
+
+    std::unique_ptr<TSpline> fSplineDataEfficiency_Double90Quad30_QuadCentralJet30  ;
+    std::unique_ptr<TSpline> fSplineDataEfficiency_Double90Quad30_DoubleCentralJet90;
+    std::unique_ptr<TSpline> fSplineDataEfficiency_Quad45_QuadCentralJet45          ;
+    std::unique_ptr<TSpline> fSplineDataEfficiency_And_QuadCentralJet45             ;
+
+    std::unique_ptr<TSpline> fSplineMcEfficiency_Double90Quad30_QuadCentralJet30    ;
+    std::unique_ptr<TSpline> fSplineMcEfficiency_Double90Quad30_DoubleCentralJet90  ;
+    std::unique_ptr<TSpline> fSplineMcEfficiency_Quad45_QuadCentralJet45            ;
+    std::unique_ptr<TSpline> fSplineMcEfficiency_And_QuadCentralJet45               ;
+
+};
 
 std::vector<jet_t> bbbb_jets_idxs_BothClosestToDiagonal(const std::vector<jet_t> *presel_jets)
 {
