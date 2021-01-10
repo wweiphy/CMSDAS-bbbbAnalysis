@@ -34,6 +34,8 @@ int main(int argc, char** argv)
     TFile* fIn = TFile::Open(inputFile.c_str());
     TTree* tIn = (TTree*) fIn->Get("bbbbTree");
 
+    TriggerEfficiencyCalculator theTriggerEfficiencyCalculator("../trigger/TriggerEfficiencies.root");
+
     cout << "[INFO] Output file: " << outputFile << endl;
     TFile* fOut = new TFile(outputFile.c_str(), "recreate");
     TTree* tOut = new TTree ("bbbbTree", "bbbbTree");
@@ -46,8 +48,6 @@ int main(int argc, char** argv)
         isSig = (std::stoi(argv[4]) == 0 ? false : true);
     cout << "[INFO] Is data?   : " << std::boolalpha << isData << std::noboolalpha << endl;
     cout << "[INFO] Is signal? : " << std::boolalpha << isSig  << std::noboolalpha << endl;
-
-    TriggerEfficiencyCalculator theTriggerEfficiencyCalculator("../trigger/TriggerEfficiencies.root");
 
     std::string sample_type = "bkg";
     if (isData) sample_type = "data";
@@ -204,7 +204,7 @@ int main(int argc, char** argv)
         otree.rndm_1_ = **(itree.rndm_1);
         otree.rndm_2_ = **(itree.rndm_2);
         otree.rndm_3_ = **(itree.rndm_3);
-
+        
         // calculate the triggerSF following the twiki indications
         if(isData) otree.trigger_SF_ = 1.;
         else
@@ -235,6 +235,7 @@ int main(int argc, char** argv)
             // Calculate the trigger scale factor (data/mc)
             otree.trigger_SF_ = -999.;
         }
+        
 
         otree.fill();
     }
