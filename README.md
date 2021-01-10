@@ -38,10 +38,10 @@ As a result of the procedure above, you will find ntuples for the exercise under
 
 ## Running the analysis
 
-1. From the inputs, build the Higgs bosons and high level objects/variables for the MVA. A skeleton of code with I/O is ``prepare_inputs.cpp`` . A script to run on all the samples is :
+1. From the inputs, build the Higgs bosons and high level objects/variables for the MVA. A skeleton of code with I/O is ``build_objects.cpp`` . A script to run on all the samples is :
 ```
 cd analysis
-source build_all.sh
+source build_all.sh #after compiling build_objects.cpp
 ```
 
 
