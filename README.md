@@ -67,6 +67,13 @@ python histogrammer.py  --datamodelhistos #Edit histogrammer.py to add more hist
 python plotter.py  --datamodelplots       #Plot them all!  
 ```
 
+## Running the MVA discriminant training
+To train a XGBoost classifier that separates SM gg HH and the background model:
+```
+cd mldiscr
+python train_bdt.py
+```
+
 ## Compute trigger scale factors
 Trigger efficiencies are computed as described in AN-2016/268
 (http://cms.cern.ch/iCMS/jsp/db_notes/noteInfo.jsp?cmsnoteid=CMS%20AN-2016/268)
