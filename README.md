@@ -1,17 +1,17 @@
 # CMSDAS-bbbbAnalysis
 Code and instructions for preparation and support of the CMS DAS HH -> bbbb analysis exercise
 
-For further information on the exercise check [the TWiki](https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideCMSDataAnalysisSchoolLPC2020HHToFourB)
+For further information on the exercise check [the TWiki](https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideCMSDataAnalysisSchoolLPC2021HHToFourB)
 
 Part of the information reported below targets the preparation of the inputs and not the development of the exercise itself.
 Refer to the TWiki for instructions on how to run the exercise.
 
 ## Installing the repo
 1. Install the bbbbAnalysis code following the instructions [here](https://github.com/UF-HH/bbbbAnalysis), using the ``CMSDAS-exercise`` branch
-2. ``git clone https://github.com/l-cadamuro/CMSDAS-bbbbAnalysis``
+2. ``git clone https://github.com/danielguerrero/CMSDAS-bbbbAnalysis``
 3. NOTE: the exercise works independently on SL6 and SL7. Installation instructions on the reference TWiki use the CMSSW version recommended for Run 2 data analysis (SL7), which is different from the one of the bbbbAnalysis above
 
-## Preparing the input ntuples for the exercise
+## Preparing the input ntuples for the exercise (this is already done for you)
 
 _All the instructions before are controlled with the variable ``TAG`` in the scripts, remember to update it every time you rerun._
 
@@ -36,7 +36,7 @@ source prepare_all.sh
 
 As a result of the procedure above, you will find ntuples for the exercise under ``/store/user/cmsdas/2020/long_exercises/DoubleHiggs/${TAG}/dasformat``
 
-## Running the analysis
+## Running the analysis (Your starting line)
 
 From the inputs, build the Higgs bosons and high level objects/variables for the MVA. A skeleton of code with I/O is ``build_objects.cpp`` . A script to run on all the samples is :
 ```
@@ -92,11 +92,21 @@ e.g. efficiency of QuadCentralJet45 vs pt of the forth highest pt jet
 Exception: since Scale factors are evaluated using ttbar events (2 real b jets only), BTagCaloCSVp087Triple efficiency must be evaluated by asking only 1 object passing the btag filter and as a function of the highest deepCSV jet.
 The efficiency of the 3 btag can the be evaluated as the probability that at least 3 of the four btags passes the cut
 
+For simplicity, we will consider just a rapresentative subset of filters:
+
+    HLT_DoubleJet90_Double30_TripleBTagCSV_p087:
+        QuadCentralJet30 -> 4 objects passing
+        DoubleCentralJet90 -> 2 objects passing 
+
+    HLT_QuadJet45_TripleBTagCSV_p087:
+        QuadCentralJet45 -> 4 objects passing 
+
 The total efficiency is eff(Double90Quad30 || Quad45) = eff(Double90Quad30) + eff(Quad45) - eff(Double90Quad30 && Quad45)
 where eff(Double90Quad30) is eff(L1)*eff(QuadCentralJet30)*eff(DoubleCentralJet90)*eff(BTagCaloCSVp087Triple)*eff(QuadPFCentralJetLooseID30)*eff(DoublePFCentralJetLooseID90). Same for eff(Quad45).
 eff(Double90Quad30 && Quad45) = eff(Double90Quad30) * eff_DJ(Quad45), where eff_DJ(Quad45) is the eff(Quad45) evaluated over a subset of events passing HLT_DoubleJet90_Double30_TripleBTagCSV_p087
 
-1. Optional (already done for you): In the bbbbAnalysis package, launch all the trigger DAS skims (SingleMuon and MC TTbar datasets) using the FNAL batch
+Here are some optional steps (already done for you):
+In the bbbbAnalysis package, launch all the trigger DAS skims (SingleMuon and MC TTbar datasets) using the FNAL batch
 ```
 ## launch
 source source scripts/submitAllTriggerSkimsOnTier3ForDAS.sh 
@@ -104,7 +114,7 @@ source source scripts/submitAllTriggerSkimsOnTier3ForDAS.sh
 for d in `ls -d ${JOBSDIR}/*` ; do echo $d ; python scripts/getTaskStatus.py --dir ${d} ; done
 ```
 
-2. Optional (already done for you): Combine all the output files in a single one per sample (in the bbbbAnalysis package) (it should take 5-10 mins)
+Combine all the output files in a single one per sample (in the bbbbAnalysis package) (it should take 5-10 mins)
 ```
 cmsenv
 voms-proxy-init -voms cms
@@ -112,19 +122,33 @@ hadd -f SingleMuon_Data_forTrigger.root `xrdfsls -u /store/user/<your_username>/
 hadd -f TTbar_MC_forTrigger.root `xrdfsls -u /store/user/<your_username>/bbbb_ntuples_CMSDAS_trigger/ntuples_26Dic2019_v4/SKIM_MC_TT_TuneCUETP8M2T4_13TeV_forTrigger/output`
 ```
 
-3. Produce trigger efficiency plots 
-go to CMSDAS-bbbbAnalysis folder 
-```
-root -l
-.L trigger/TriggerEfficiencyByFilter.C+
-ProduceAllTriggerEfficiencies("root://cmsxrootd.fnal.gov//store/user/cmsdas/2020/long_exercises/DoubleHiggs/triggerNtuples_30Dic2019/SingleMuon_Data_forTrigger.root","root://cmsxrootd.fnal.gov//store/user/cmsdas/2020/long_exercises/DoubleHiggs/triggerNtuples_30Dic2019/TTbar_MC_forTrigger.root","TriggerEfficiencies.root")
-```
-At this point you should have the trigger efficiencies for each filter for data and MC in the file TriggerEfficiencies.root
+Here is the main exercise:
 
-4. Fit the efficiencies (find a reasonable curve)
+1. Produce trigger efficiency plots
 
-5. In the script which runs the skims for the analysis include the trigger efficiencies to calculate the trigger scale factor:
-    a. add a branch in the skim that will contain the trigger scale factor
-    b. calculate the trigger efficiency as eff(Double90Quad30 || Quad45) = eff(Double90Quad30) + eff(Quad45) - eff(Double90Quad30 && Quad45) both using data and MC efficiencies
-    c. calculate the scale factor as eff_data(Double90Quad30 || Quad45) / eff_mc(Double90Quad30 || Quad45) and put the result in the branch
-    
+    go to CMSDAS-bbbbAnalysis folder
+```
+    cd trigger
+    root -l
+    .L TriggerEfficiencyByFilter.C+
+    ProduceAllTriggerEfficiencies ()
+```
+At this point you should have the trigger efficiencies for each filter for data and MC in the file TriggerEfficiencies.root. In the file you will find both the TGraph and the TSpline that connects the efficiency point that will be used to evaluate the efficiency 
+
+2. Have a quick look in analysis/include/bbbb_functions.h to the class TriggerEfficiencyCalculator. It contains the function to read the TSpline from the file TriggerEfficiencies.root.The functions that you need to use are the following:
+```
+    float getDataEfficiency_Double90Quad30_QuadCentralJet30 (float fourthLeadingJet) -> eff(QuadCentralJet30) in data
+    float getDataEfficiency_Double90Quad30_DoubleCentralJet90(float secondLeadingJet) -> eff(DoubleCentralJet90) in data
+    float getDataEfficiency_Quad45_QuadCentralJet45 (float fourthLeadingJet) -> eff(QuadCentralJet45) in data
+    float getDataEfficiency_And_QuadCentralJet45 (float fourthLeadingJet) -> effAnd(Quad45) in data
+    float getMcEfficiency_Double90Quad30_QuadCentralJet30 (float fourthLeadingJet) -> eff(QuadCentralJet30) in MC
+    float getMcEfficiency_Double90Quad30_DoubleCentralJet90 (float secondLeadingJet) -> eff(DoubleCentralJet90) in MC
+    float getMcEfficiency_Quad45_QuadCentralJet45 (float fourthLeadingJet) -> eff(QuadCentralJet45) in MC
+    float getMcEfficiency_And_QuadCentralJet45 (float fourthLeadingJet) -> effAnd(Quad45) in MC
+```
+3. In the script that produced the output ntuples (analysis/build_objects.cpp) correctly calculate the trigger SF (skeleton from line ~210):
+    a. calculate the trigger efficiencies for all the filters using the function of the previous point
+    b. calculate the total trigger efficiency in data and MC using the formula at the beginning of this section
+    c. calculate the scale factor as eff_data( Double90Quad30 || Quad45) / eff_mc( Double90Quad30 || Quad45) and put the result in the trigger_SF_ branch 
+
+4. Include the trigger SF for the other steps of the analysis 
