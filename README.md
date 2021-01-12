@@ -38,12 +38,34 @@ As a result of the procedure above, you will find ntuples for the exercise under
 
 ## Running the analysis
 
-1. From the inputs, build the Higgs bosons and high level objects/variables for the MVA. A skeleton of code with I/O is ``build_objects.cpp`` . A script to run on all the samples is :
+From the inputs, build the Higgs bosons and high level objects/variables for the MVA. A skeleton of code with I/O is ``build_objects.cpp`` . A script to run on all the samples is :
 ```
 cd analysis
 source build_all.sh #after compiling build_objects.cpp
 ```
 
+## Running the background model
+To train the background model using control region data:
+```
+cd background
+python make_bkg_model.py #Takes at least 10 mins for default, however can take longer for larger number of events and more complex hyperparameters.
+```
+
+## Plotting variables in data and MC Simulation from /analysis/build_objects.cpp outputs
+After you created the new objects/variables and produced the root files (objects_*.root) in the folder ``analysis``. Then, you can plot data/MC/signal using ROOT by following these instructions:
+
+```
+cd plotter 
+python histogrammer.py  --datamchistos #Edit histogrammer.py to add more histograms, weights, selections, etc
+python plotter.py  --datamcplots       #Plot them all!  
+```
+## Plotting variables in data and bkg. model from /background/make_bkg_model.py outputs
+After you trained the background model and produced the two root files (data_4btag and data_3btag_with_weights_AR) in the folder ``background``. Then, you can plot data vs model using ROOT by following these instructions:
+```
+cd plotter 
+python histogrammer.py  --datamodelhistos #Edit histogrammer.py to add more histograms, weights, selections, etc
+python plotter.py  --datamodelplots       #Plot them all!  
+```
 
 ## Compute trigger scale factors
 Trigger efficiencies are computed as described in AN-2016/268
