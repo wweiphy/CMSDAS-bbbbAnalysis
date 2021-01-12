@@ -106,7 +106,8 @@ where eff(Double90Quad30) is eff(L1)*eff(QuadCentralJet30)*eff(DoubleCentralJet9
 eff(Double90Quad30 && Quad45) = eff(Double90Quad30) * eff_DJ(Quad45), where eff_DJ(Quad45) is the eff(Quad45) evaluated over a subset of events passing HLT_DoubleJet90_Double30_TripleBTagCSV_p087
 
 Here are some optional steps (already done for you):
-In the bbbbAnalysis package, launch all the trigger DAS skims (SingleMuon and MC TTbar datasets) using the FNAL batch
+
++In the bbbbAnalysis package, launch all the trigger DAS skims (SingleMuon and MC TTbar datasets) using the FNAL batch
 ```
 ## launch
 source source scripts/submitAllTriggerSkimsOnTier3ForDAS.sh 
@@ -114,7 +115,7 @@ source source scripts/submitAllTriggerSkimsOnTier3ForDAS.sh
 for d in `ls -d ${JOBSDIR}/*` ; do echo $d ; python scripts/getTaskStatus.py --dir ${d} ; done
 ```
 
-Combine all the output files in a single one per sample (in the bbbbAnalysis package) (it should take 5-10 mins)
++Combine all the output files in a single one per sample (in the bbbbAnalysis package) (it should take 5-10 mins)
 ```
 cmsenv
 voms-proxy-init -voms cms
