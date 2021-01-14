@@ -33,7 +33,19 @@ class output_tree {
         float        btag_SF_lightup_;    
         float        btag_SF_lightdown_;  
         float        norm_weight_;      
-        float        trigger_SF_;  
+        float        trigger_SF_; 
+
+        float dataEfficiency_Double90Quad30_QuadCentralJet30 ;
+        float dataEfficiency_Double90Quad30_DoubleCentralJet90 ;
+        float dataEfficiency_Quad45_QuadCentralJet45 ;
+        float dataEfficiency_And_QuadCentralJet45 ;
+        float dataEfficiency ;
+
+        float mcEfficiency_Double90Quad30_QuadCentralJet30 ;
+        float mcEfficiency_Double90Quad30_DoubleCentralJet90 ;
+        float mcEfficiency_Quad45_QuadCentralJet45 ;
+        float mcEfficiency_And_QuadCentralJet45 ;
+        float mcEfficiency ;
 
         int  n_btag_;
 
@@ -120,6 +132,22 @@ void output_tree::init()
     tree_ ->Branch ("norm_weight",       &norm_weight_);
     tree_ ->Branch ("trigger_SF",        &trigger_SF_);
 
+
+    tree_ ->Branch ("dataEfficiency_Double90Quad30_QuadCentralJet30",&dataEfficiency_Double90Quad30_QuadCentralJet30);
+    tree_ ->Branch ("dataEfficiency_Double90Quad30_DoubleCentralJet90",&dataEfficiency_Double90Quad30_DoubleCentralJet90);
+    tree_ ->Branch ("dataEfficiency_Quad45_QuadCentralJet45",&dataEfficiency_Quad45_QuadCentralJet45);
+    tree_ ->Branch ("dataEfficiency_And_QuadCentralJet45",&dataEfficiency_And_QuadCentralJet45);
+    tree_ ->Branch ("dataEfficiency",&dataEfficiency);
+
+    tree_ ->Branch ("mcEfficiency_Double90Quad30_QuadCentralJet30",
+    &mcEfficiency_Double90Quad30_QuadCentralJet30);
+    tree_ ->Branch ("mcEfficiency_Double90Quad30_DoubleCentralJet90",&mcEfficiency_Double90Quad30_DoubleCentralJet90);
+    tree_ ->Branch ("mcEfficiency_Quad45_QuadCentralJet45",&mcEfficiency_Quad45_QuadCentralJet45);
+    tree_ ->Branch ("mcEfficiency_And_QuadCentralJet45",&mcEfficiency_And_QuadCentralJet45);
+    tree_ ->Branch ("mcEfficiency",&mcEfficiency);
+
+
+
     tree_ ->Branch ("n_btag",  &n_btag_);
 
     tree_ -> Branch ("H1_pt",  &H1_pt_);
@@ -183,6 +211,19 @@ void output_tree::clear_vars()
     btag_SF_lightdown_ = -999;
     norm_weight_       = -999;
     trigger_SF_        = -999;
+    dataEfficiency_Double90Quad30_QuadCentralJet30 = -999;
+    dataEfficiency_Double90Quad30_DoubleCentralJet90 = -999;
+    dataEfficiency_Quad45_QuadCentralJet45 = -999;
+    dataEfficiency_And_QuadCentralJet45= -999;
+    dataEfficiency=-999;
+
+    mcEfficiency_Double90Quad30_QuadCentralJet30=-999;
+    mcEfficiency_Double90Quad30_DoubleCentralJet90=-999;
+    mcEfficiency_Quad45_QuadCentralJet45=-999;
+    mcEfficiency_And_QuadCentralJet45=-999;
+    mcEfficiency=-999;
+
+
 
     n_btag_ = -999;
 
