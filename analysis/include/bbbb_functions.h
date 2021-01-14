@@ -166,4 +166,70 @@ std::vector<jet_t> bbbb_jets_idxs_BothClosestToDiagonal(const std::vector<jet_t>
     return outputJets;
 }
 
+std::tuple<bool,bool> PairingEfficiencyFlags(std::vector<TLorentzVector> quarks,std::vector<TLorentzVector> jets)
+{
+    
+    //output is two flags
+    std::tuple<bool,bool> output;  
+
+    //Let's start assumming that our four preselected jets are not coming the four b-quarks hadronization
+    bool fullreconstruction=false;
+    //Let's start assumming that our four preselected jets are not correctly paired
+    bool fullpairing=false;
+
+    //---------Create vector with the quark p4 and some quark id's
+    //qid = 0, gen_H1_b1
+    //qid = 1, gen_H1_b2
+    //qid = 2, gen_H1_b3
+    //qid = 3, gen_H1_b4 
+    std::vector<std::tuple<TLorentzVector,int>> quarksandids;
+    for (uint k=0;k < quarks.size();k++ ) quarksandids.push_back( std::make_tuple(quarks.at(k),k) );
+    //---------Create vector with the quark p4 and qid
+ 
+    //Loop over the jets to match them to the closest quark by dR and its quark id 
+    std::vector<std::tuple<TLorentzVector,int>> jetsandquarkids;
+    int nreco = 0;
+    for (uint x=0;x < jets.size();x++ )
+    {
+       //Initialize variables
+       float maxDeltaR = 0.3;
+       bool  matched   = false;
+       int   id        = -999;
+       int   rem       = -999;
+       //Loop over the quarkid array
+       for (uint y=0;y < quarksandids.size(); y++ ){
+            //Compute dR
+            float deltaR = jets[x].DeltaR( std::get<0>(quarksandids[y]) );
+            //if it dR<maxDeltaR, then is coming from one of the b-quarks
+            if(deltaR < maxDeltaR){maxDeltaR=deltaR; matched=true; id = std::get<1>(quarksandids[y]); rem=y;}
+       }
+       //If matched, then count it
+       if(matched) nreco+=1;
+       //Fill the quarkid information associated to jet with the match
+       jetsandquarkids.push_back(std::make_tuple(jets.at(x),id));
+       //To avoid matching multiple quarks to the same jet, let's erase the matched quark from the list
+       if(matched) quarksandids.erase(quarksandids.begin()+rem);
+    }
+
+    //Check1: Full Reconstruction flag
+    //If one of the jets is not coming from the quark, then reconstuction is not complete (this event cannot be used as denominator).
+    if (nreco == 4) fullreconstruction=true;
+
+    //Check2: Full Pairing flag
+    //Check that four jets are matched the H1 quarks or the H2 quarks
+    int H1_b1_qid = std::get<1>(jetsandquarkids[0]);
+    int H1_b2_qid = std::get<1>(jetsandquarkids[1]);
+    int H2_b1_qid = std::get<1>(jetsandquarkids[2]);
+    int H2_b2_qid = std::get<1>(jetsandquarkids[3]);
+
+    if( (H1_b1_qid+H1_b2_qid==1) && (H2_b1_qid+H2_b2_qid==5) ) fullpairing=true;
+    if( (H1_b1_qid+H1_b2_qid==5) && (H2_b1_qid+H2_b2_qid==1) ) fullpairing=true;
+
+    //Let's return the output flags
+    output = std::make_tuple(fullreconstruction,fullpairing);
+
+    return output;
+}
+
+
 #endif

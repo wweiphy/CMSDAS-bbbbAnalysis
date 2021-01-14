@@ -63,6 +63,9 @@ int main(int argc, char** argv)
     // prepare the input tree reader and run the event loop
     input_tree itree(tIn, sample_type);
 
+    //Initialize pairing efficiency denominator and numerator
+    float den=0.,num=0.;
+
     const auto nEv = tIn->GetEntries();
     for (uint iEv = 0; iEv < nEv; ++iEv)
     {
@@ -236,6 +239,38 @@ int main(int argc, char** argv)
             otree.trigger_SF_ = -999.;
         }
         
+        //----------Pairing efficiency code
+        //Requires the sample to be signal and have four b-tagged jets (our region of interest)
+        if (isSig && otree.n_btag_>=4)
+        {
+              //Create TLorentzVectors and put them together in vectors
+              TLorentzVector v_gen_H1_b1,v_gen_H1_b2,v_gen_H2_b1,v_gen_H2_b2;
+              v_gen_H1_b1.SetPtEtaPhiM(**(itree.gen_H1_b1_pt),**(itree.gen_H1_b1_eta),**(itree.gen_H1_b1_phi),**(itree.gen_H1_b1_m)); 
+              v_gen_H1_b2.SetPtEtaPhiM(**(itree.gen_H1_b2_pt),**(itree.gen_H1_b2_eta),**(itree.gen_H1_b2_phi),**(itree.gen_H1_b2_m)); 
+              v_gen_H2_b1.SetPtEtaPhiM(**(itree.gen_H2_b1_pt),**(itree.gen_H2_b1_eta),**(itree.gen_H2_b1_phi),**(itree.gen_H2_b1_m)); 
+              v_gen_H2_b2.SetPtEtaPhiM(**(itree.gen_H2_b2_pt),**(itree.gen_H2_b2_eta),**(itree.gen_H2_b2_phi),**(itree.gen_H2_b2_m)); 
+              TLorentzVector v_H1_b1,v_H1_b2,v_H2_b1,v_H2_b2;
+              v_H1_b1 = H1_b1.p4; 
+              v_H1_b2 = H1_b2.p4; 
+              v_H2_b1 = H2_b1.p4; 
+              v_H2_b2 = H2_b2.p4; 
+              std::vector<TLorentzVector> myjetsp4   = {v_H1_b1,v_H1_b2,v_H2_b1,v_H2_b2};
+              std::vector<TLorentzVector> myquarksp4 = {v_gen_H1_b1,v_gen_H1_b2,v_gen_H2_b1,v_gen_H2_b2};
+              //Run the pairingefficiencyflags function
+              std:tuple<bool,bool> effflags = PairingEfficiencyFlags(myquarksp4,myjetsp4);
+              //Compute the weight of the event = NormWeight * btagSF * triggerSF (if available) 
+              float count = (**(itree.norm_weight)) * (**(itree.btag_SF));
+              //1. Check that the four jets are reconstructed/matched to the four quarks
+              //If passes, count goes in the denominator
+              if(get<0>(effflags))
+              {
+                den+=count; 
+                //2. Check that the pairing was correct
+                //If passes, then count goes in the numerator
+                if(get<1>(effflags)) num+=count; 
+              }
+        }
+        //----------Pairing efficiency code
 
         otree.fill();
     }
@@ -246,5 +281,8 @@ int main(int argc, char** argv)
 
     fIn->Close();
     fOut->Close();
+
+    //Print pairing efficiency result
+    if(isSig) cout<<"[INFO] The pairing efficiency in signal events with 4 b-tags = "<<(float)num/den<<endl;
 
 }
