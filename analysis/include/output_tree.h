@@ -156,6 +156,22 @@ void output_tree::init()
     tree_ ->Branch ("Jet4Pt",  &Jet4Pt);
 
 
+
+    tree_ ->Branch ("dataEfficiency_Double90Quad30_QuadCentralJet30",&dataEfficiency_Double90Quad30_QuadCentralJet30);
+    tree_ ->Branch ("dataEfficiency_Double90Quad30_DoubleCentralJet90",&dataEfficiency_Double90Quad30_DoubleCentralJet90);
+    tree_ ->Branch ("dataEfficiency_Quad45_QuadCentralJet45",&dataEfficiency_Quad45_QuadCentralJet45);
+    tree_ ->Branch ("dataEfficiency_And_QuadCentralJet45",&dataEfficiency_And_QuadCentralJet45);
+    tree_ ->Branch ("dataEfficiency",&dataEfficiency);
+
+    tree_ ->Branch ("mcEfficiency_Double90Quad30_QuadCentralJet30",
+    &mcEfficiency_Double90Quad30_QuadCentralJet30);
+    tree_ ->Branch ("mcEfficiency_Double90Quad30_DoubleCentralJet90",&mcEfficiency_Double90Quad30_DoubleCentralJet90);
+    tree_ ->Branch ("mcEfficiency_Quad45_QuadCentralJet45",&mcEfficiency_Quad45_QuadCentralJet45);
+    tree_ ->Branch ("mcEfficiency_And_QuadCentralJet45",&mcEfficiency_And_QuadCentralJet45);
+    tree_ ->Branch ("mcEfficiency",&mcEfficiency);
+
+
+
     tree_ ->Branch ("n_btag",  &n_btag_);
 
     tree_ -> Branch ("H1_pt",  &H1_pt_);
