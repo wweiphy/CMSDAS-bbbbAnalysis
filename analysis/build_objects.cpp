@@ -43,11 +43,21 @@ int main(int argc, char** argv)
     bool isData = false;
     bool isSig  = false;
     if (argc >= 4)
-        isData = (std::stoi(argv[3]) == 0 ? false : true);
+        isData = (std::stoi(argv[3]) == 0 ? false : true); //stoi("45") is 45
     if (argc >= 5)
         isSig = (std::stoi(argv[4]) == 0 ? false : true);
     cout << "[INFO] Is data?   : " << std::boolalpha << isData << std::noboolalpha << endl;
     cout << "[INFO] Is signal? : " << std::boolalpha << isSig  << std::noboolalpha << endl;
+    
+//     int main () {
+//       bool b = true;
+//       std::cout << std::boolalpha << b << '\n';
+//       std::cout << std::noboolalpha << b << '\n';
+//       return 0;
+//     }
+//     Output
+//     true
+//     1
 
     std::string sample_type = "bkg";
     if (isData) sample_type = "data";
@@ -61,7 +71,7 @@ int main(int argc, char** argv)
     output_tree otree;
 
     // prepare the input tree reader and run the event loop
-    input_tree itree(tIn, sample_type);
+    input_tree itree(tIn, sample_type); //defined in input_tree.h
 
     //Initialize pairing efficiency denominator and numerator
     float den=0.,num=0.;
@@ -116,7 +126,9 @@ int main(int argc, char** argv)
 
         // pair the jets
         std::vector<jet_t> jets {jet1, jet2, jet3, jet4};
-        std::vector<jet_t> result = bbbb_jets_idxs_BothClosestToDiagonal(&jets);
+        std::vector<jet_t> result = bbbb_jets_idxs_BothClosestToDiagonal(&jets); //pairing b jets using closest diagonal distance
+        // return result(0) and result(1) paired, result(2) and result(3) paired
+        // see include funciton.h for bbbb_jets_idxs_BothClosestToDiagonal()
 
         TLorentzVector v_H1, v_H2, v_HH;
         v_H1 = result.at(0).p4_breg + result.at(1).p4_breg;
